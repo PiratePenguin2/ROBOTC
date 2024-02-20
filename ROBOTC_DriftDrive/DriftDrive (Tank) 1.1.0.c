@@ -22,9 +22,8 @@
 
 /*-----Config-----*/
 	const float rearMultiplier = 0.35; //This multiplier is used for the back wheel, to ensure that it is pivoting at a similar speed to the outside wheels.
-	const float turnMultiplier = 0.5;
 	const float jitter = 25.0;
-	const float motorMax = 100; // # out of 127
+	const float motorMax = 127; // # out of 127
 	const float motorMin = 10.0;
 
 	const float speedSmoothing = .25; //0<x<1, closer to zero = smoother
@@ -97,64 +96,14 @@
 	}
 
 /*-----DriftDrive-----*/
-	void driftDrive()
+	void driftDriveTank()
 	{
 	//Lx is Ch1, Ly is Ch2, Ry is Ch3, Rx is Ch4
   	  //If Lx [Ch4] is right, slow down right motor. If it's left, slow down left motor
 
 /*Take inputs from the joystick, and determine how the bot should move*/
-	//Pivot
-		if ((vexRT[Ch1] <= -jitter) && ((vexRT[Ch3] <= jitter)&&(vexRT[Ch3] >= -jitter))) 					//All the way right, rotate clockwise
-		{
-			targetSpeedL = vexRT[Ch1];
-			targetSpeedR = -vexRT[Ch1];
-		}
-		else if ((vexRT[Ch1] >= jitter) && ((vexRT[Ch3] <= jitter)&&(vexRT[Ch3] >= -jitter)))			//All the way left, rotate counter-clockwise
-		{
-			targetSpeedL = vexRT[Ch1];
-			targetSpeedR = -vexRT[Ch1];
-		}
-	//Forwards
-		else if ((vexRT[Ch1] >= jitter) && (vexRT[Ch3] >= jitter || vexRT[Ch3] <= jitter))					//Turn Clockwise, Right motor small multiplier
-		{
-			targetSpeedL = vexRT[Ch3] * turnMultiplier;
-			targetSpeedR = (vexRT[Ch3] * ((-2 * vexRT[Ch1]) + 127) / 127);
-	}
-	else if ((vexRT[Ch1] <= jitter) && (vexRT[Ch3] >= jitter || vexRT[Ch3] <= jitter))					//Turn Counter-Clockwise, Left motor small multiplier
-	{
-			targetSpeedL = (vexRT[Ch3] * ((2 * vexRT[Ch1]) + 127) / 127);
-			targetSpeedR = vexRT[Ch3] * turnMultiplier;
-		}
-	//Backwards
-		/*
-		else if ((vexRT[Ch4] >= jitter) && (vexRT[Ch3] <= -jitter))					//Turn Counter-Clockwise, Left motor small multiplier
-		{
-			targetSpeedL = (vexRT[Ch3] * ((2 * vexRT[Ch4]) + 127) / 127); /////////////PROBLEM!!!!! uh oh!!!
-			targetSpeedR = -vexRT[Ch3];
-	}
-	else if ((vexRT[Ch4] <= jitter) && (vexRT[Ch3] <= -jitter))					//Turn Clockwise, Right motor small multiplier
-	{
-			targetSpeedL = -vexRT[Ch3];
-			targetSpeedR = (vexRT[Ch3] * ((-2 * vexRT[Ch4]) + 127) / 127); ////////////////
-		}
-		*/
-	//Straight for/backward /*----------------------EXPERIMENTAL------------------------*/
-		else if (vexRT[Ch3] >= jitter || vexRT[Ch3] <= jitter)
-		{
-			targetSpeedL = vexRT[Ch3];
-			targetSpeedR = vexRT[Ch3];
-		}
-
-	//Stop
-		else
-		{
-			targetSpeedL = 0;
-			targetSpeedR = 0;
-		}
-
-	targetSpeedL = (targetSpeedL / 127) * motorMax;
-	targetSpeedR = (targetSpeedR / 127) * motorMax;
-
+	targetSpeedL = vexRT[Ch3] * motorMax / 127;
+	targetSpeedR = vexRT[Ch2] * motorMax / 127;
 
 /*Smooth the speed to prevent motor damage*/
 		smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, speedSmoothing);			//lerp(smoothSpeedL, targetSpeedL, accel * (delta));
@@ -190,7 +139,7 @@ task main()
 			while (!eStopState)	//While eStop is off
 			{
 
-				driftDrive();
+				driftDriveTank();
 
 				wait1Msec(1000/fps);
 				eStopCheck();
