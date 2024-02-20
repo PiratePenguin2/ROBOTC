@@ -108,9 +108,9 @@
 		targetSpeedL = vexRT[Ch3] * motorMax / 127;
 	}
 	else
-	(
+	{
 		targetSpeedL = 0;
-	)
+	}
 	
 	//Right
 	if (abs(vexRT[Ch2]) > jitter)
@@ -118,9 +118,9 @@
 		targetSpeedR = vexRT[Ch2] * motorMax / 127;
 	}
 	else
-	(
+	{
 		targetSpeedR = 0;
-	)
+	}
 
 /*Smooth the speed to prevent motor damage*/
 		smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, speedSmoothing);			//lerp(smoothSpeedL, targetSpeedL, accel * (delta));
