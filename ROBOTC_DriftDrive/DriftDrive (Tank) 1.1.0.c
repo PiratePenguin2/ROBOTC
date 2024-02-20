@@ -102,8 +102,25 @@
   	  //If Lx [Ch4] is right, slow down right motor. If it's left, slow down left motor
 
 /*Take inputs from the joystick, and determine how the bot should move*/
-	targetSpeedL = vexRT[Ch3] * motorMax / 127;
-	targetSpeedR = vexRT[Ch2] * motorMax / 127;
+	//Left
+	if (abs(vexRT[Ch3]) > jitter)
+	{
+		targetSpeedL = vexRT[Ch3] * motorMax / 127;
+	}
+	else
+	(
+		targetSpeedL = 0;
+	)
+	
+	//Right
+	if (abs(vexRT[Ch2]) > jitter)
+	{
+		targetSpeedR = vexRT[Ch2] * motorMax / 127;
+	}
+	else
+	(
+		targetSpeedR = 0;
+	)
 
 /*Smooth the speed to prevent motor damage*/
 		smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, speedSmoothing);			//lerp(smoothSpeedL, targetSpeedL, accel * (delta));
