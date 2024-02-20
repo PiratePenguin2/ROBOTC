@@ -44,130 +44,25 @@ bool joystick = false;
 bool clawGrip = false;
 
 
-	float lerp(float a, float b, float weight)
-	{
-		return a * (1 - weight) + b*weight;
-	}
+        float lerp(float a, float b, float weight)
+        {
+            return a * (1 - weight) + b*weight;
+        }
 
-	void zero()
-	{
-		SensorValue[leftEncoder] = 0;
-		SensorValue[rightEncoder] = 0;
-		smoothSpeedL = 0;
-		smoothSpeedR = 0;
+        void zero()
+        {
+            SensorValue[leftEncoder] = 0;
+            SensorValue[rightEncoder] = 0;
+            smoothSpeedL = 0;
+            smoothSpeedR = 0;
 
-		step = 0;
-		ticksLI = 0;	ticksRI = 0;
-		ticksLF = 0;	ticksRF = 0;
-		speedL 	= 0;	speedR 	= 0;
-	}
-
-
-
-void moveForward(int distance)
-{
-	int ticks = (distance / (wheelDiam * PI)) * (encoderTicks);
-
-	zero();
-  while(SensorValue[leftEncoder] < ticks || SensorValue[rightEncoder] < ticks)
-  {
-		//Left Motor
-  	if (SensorValue[leftEncoder] < ticks)
-		{
-			if (SensorValue[rightEncoder] - SensorValue[leftEncoder] > tol)  // While less than 5 rotations on the leftEncoder...
-			{
-				motor[leftMotor] = motorHigh;
-			}
-			else
-			{
-				smoothSpeedL = lerp(smoothSpeedL, motorLow, speedSmoothing);
-				motor[leftMotor] = smoothSpeedL;
-			}
-		}
-		else
-		{
-				smoothSpeedL = lerp(smoothSpeedL, motorStop, speedSmoothing);
-				motor[leftMotor] = smoothSpeedL;
-		}
-
-		//Right Motor
-		if (SensorValue[rightEncoder] < ticks)
-		{
-			if (SensorValue[leftEncoder] - SensorValue[rightEncoder] > tol)  // While less than 5 rotations on the rightEncoder...
-			{
-				motor[rightMotor] = motorHigh;
-			}
-			else
-			{
-				smoothSpeedR = lerp(smoothSpeedR, motorLow, speedSmoothing);
-				motor[rightMotor] = smoothSpeedR;
-			}
-		}
-		else
-		{
-				smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmoothing);
-				motor[rightMotor] = smoothSpeedR;
-		}
-	}
-
-	motor[leftMotor] = 0;
-	motor[rightMotor] = 0;
-	wait1Msec(1000);
-}
-
-void moveBackward(int distance)
-{
-	int ticks = (-distance / (wheelDiam * PI)) * (encoderTicks);
-
-	zero();
-  while(SensorValue[leftEncoder] > ticks || SensorValue[rightEncoder] > ticks)
-  {
-		//Left Motor
-  	if (SensorValue[leftEncoder] > ticks)
-		{
-			if (SensorValue[leftEncoder] - SensorValue[rightEncoder] > tol)  // While less than 5 rotations on the leftEncoder...
-			{
-				motor[leftMotor] = -motorHigh;
-			}
-			else
-			{
-				smoothSpeedL = lerp(smoothSpeedL, -motorLow, speedSmoothing);
-				motor[leftMotor] = smoothSpeedL;
-			}
-		}
-		else
-		{
-				smoothSpeedL = lerp(smoothSpeedL, -motorStop, speedSmoothing);
-				motor[leftMotor] = smoothSpeedL;
-		}
-
-		//Right Motor
-		if (SensorValue[rightEncoder] > ticks)
-		{
-			if (SensorValue[rightEncoder] - SensorValue[leftEncoder] > tol)  // While less than 5 rotations on the leftEncoder...
-			{
-				motor[rightMotor] = -motorHigh;
-			}
-			else
-			{
-				smoothSpeedR = lerp(smoothSpeedR, -motorLow, speedSmoothing);
-				motor[rightMotor] = smoothSpeedR;
-			}
-		}
-		else
-		{
-				smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmoothing);
-				motor[rightMotor] = smoothSpeedR;
-		}
-	}
-
-	motor[leftMotor] = 0;
-	motor[rightMotor] = 0;
-	wait1Msec(1000);
-}
-
-
-		void changeDelta()
+            step = 0;
+            ticksLI = 0;	ticksRI = 0;
+            ticksLF = 0;	ticksRF = 0;
+            speedL 	= 0;	speedR 	= 0;
+        }
+        
+        void changeDelta()
 		{
 			// ticks final = current # of ticks in wheel
 			ticksLF = abs(SensorValue[leftEncoder]);
@@ -194,175 +89,278 @@ void moveBackward(int distance)
 		}
 
 
-//pointTurn			//(r +- offset/2) * (deg/360) * (1/(wheelDiam * PI)) * 360
-void pointTurn(float deg, float offset)
+    void moveForward(int ft, int in)
+    {
+        int distance = 12(ft) + in;
+        int ticks = (distance / (wheelDiam * PI)) * (encoderTicks);
+
+        zero();
+    while(SensorValue[leftEncoder] < ticks || SensorValue[rightEncoder] < ticks)
+    {
+            //Left Motor
+        if (SensorValue[leftEncoder] < ticks)
+            {
+                if (SensorValue[rightEncoder] - SensorValue[leftEncoder] > tol)  // While less than 5 rotations on the leftEncoder...
+                {
+                    motor[leftMotor] = motorHigh;
+                }
+                else
+                {
+                    smoothSpeedL = lerp(smoothSpeedL, motorLow, speedSmoothing);
+                    motor[leftMotor] = smoothSpeedL;
+                }
+            }
+            else
+            {
+                    smoothSpeedL = lerp(smoothSpeedL, motorStop, speedSmoothing);
+                    motor[leftMotor] = smoothSpeedL;
+            }
+
+            //Right Motor
+            if (SensorValue[rightEncoder] < ticks)
+            {
+                if (SensorValue[leftEncoder] - SensorValue[rightEncoder] > tol)  // While less than 5 rotations on the rightEncoder...
+                {
+                    motor[rightMotor] = motorHigh;
+                }
+                else
+                {
+                    smoothSpeedR = lerp(smoothSpeedR, motorLow, speedSmoothing);
+                    motor[rightMotor] = smoothSpeedR;
+                }
+            }
+            else
+            {
+                    smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmoothing);
+                    motor[rightMotor] = smoothSpeedR;
+            }
+        }
+
+        motor[leftMotor] = 0;
+        motor[rightMotor] = 0;
+        wait1Msec(1000);
+    }
+
+    void moveBackward(int ft, int in)
+    {
+        int distance = 12(ft) + in;
+        int ticks = (-distance / (wheelDiam * PI)) * (encoderTicks);
+
+        zero();
+    while(SensorValue[leftEncoder] > ticks || SensorValue[rightEncoder] > ticks)
+    {
+            //Left Motor
+        if (SensorValue[leftEncoder] > ticks)
+            {
+                if (SensorValue[leftEncoder] - SensorValue[rightEncoder] > tol)  // While less than 5 rotations on the leftEncoder...
+                {
+                    motor[leftMotor] = -motorHigh;
+                }
+                else
+                {
+                    smoothSpeedL = lerp(smoothSpeedL, -motorLow, speedSmoothing);
+                    motor[leftMotor] = smoothSpeedL;
+                }
+            }
+            else
+            {
+                    smoothSpeedL = lerp(smoothSpeedL, -motorStop, speedSmoothing);
+                    motor[leftMotor] = smoothSpeedL;
+            }
+
+            //Right Motor
+            if (SensorValue[rightEncoder] > ticks)
+            {
+                if (SensorValue[rightEncoder] - SensorValue[leftEncoder] > tol)  // While less than 5 rotations on the leftEncoder...
+                {
+                    motor[rightMotor] = -motorHigh;
+                }
+                else
+                {
+                    smoothSpeedR = lerp(smoothSpeedR, -motorLow, speedSmoothing);
+                    motor[rightMotor] = smoothSpeedR;
+                }
+            }
+            else
+            {
+                    smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmoothing);
+                    motor[rightMotor] = smoothSpeedR;
+            }
+        }
+
+        motor[leftMotor] = 0;
+        motor[rightMotor] = 0;
+        wait1Msec(1000);
+    }
+
+    void pointTurn(float deg, float offset)
+    {
+        //pointTurn			//(r +- offset/2) * (deg/360) * (1/(wheelDiam * PI)) * 360
+        int totalLticks  = (int)( ((offset + wheelWidth/1) * PI) * (deg/360) * (1/(wheelDiam * PI)) * 360 );//((deg/2) / (wheelDiam * PI)) * (encoderTicks);
+        int totalRticks  = (int)( ((offset - wheelWidth/1) * PI) * (deg/360) * (1/(wheelDiam * PI)) * 360 );
+
+        zero();
+        targetSpeedL = motorTurnStart;
+        targetSpeedR = motorTurnStart;
+
+        while(abs(SensorValue[leftEncoder]) < abs(totalLticks) || abs(SensorValue[rightEncoder]) < abs(totalRticks))
+    {
+        step++;
+        if (step % 10 == 0)
+        {
+            changeDelta();
+        }
+
+            //Left Motor
+        if (abs(SensorValue[leftEncoder]) < abs(totalLticks))
+            {
+                    smoothSpeedL = lerp(smoothSpeedL, (totalLticks > 0 ? targetSpeedL : -targetSpeedL), speedSmoothing);
+                    motor[leftMotor] = smoothSpeedL;
+            }
+            else
+            {
+                    smoothSpeedL = lerp(smoothSpeedL, motorStop, 1);
+                    motor[leftMotor] = smoothSpeedL;
+            }
+
+            //Right Motor
+            if (abs(SensorValue[rightEncoder]) < abs(totalRticks))
+            {
+                    smoothSpeedR = lerp(smoothSpeedR, (totalRticks > 0 ? targetSpeedR : -targetSpeedR), speedSmoothing);
+                    motor[rightMotor] = smoothSpeedR;
+            }
+            else
+            {
+                    smoothSpeedR = lerp(smoothSpeedR, motorStop, 1);
+                    motor[rightMotor] = smoothSpeedR;
+            }
+        }
+
+        smoothSpeedL = 0;
+        smoothSpeedR = 0;
+        motor[leftMotor] = 0;
+        motor[rightMotor] = 0;
+        wait1Msec(1000);
+    }
+
+    void liftArm(float armMove, int mSec, float armHold, float openSpeed, float gripStrength)
+    {
+        motor[clawMotor] = openSpeed;
+        wait1Msec(mSec);
+
+        motor[clawMotor] = gripStrength;
+        motor[armMotor] = armMove;
+        wait1Msec(mSec);
+
+        motor[clawMotor] = gripStrength;
+        motor[armMotor] = armHold;
+
+    }
+
+
+void autonomous()
 {
-	int totalLticks  = (int)( ((offset + wheelWidth/1) * PI) * (deg/360) * (1/(wheelDiam * PI)) * 360 );//((deg/2) / (wheelDiam * PI)) * (encoderTicks);
-	int totalRticks  = (int)( ((offset - wheelWidth/1) * PI) * (deg/360) * (1/(wheelDiam * PI)) * 360 );
+    //Move forward 9ft 0in
+    moveForward(9, 0);
+        pointTurn(85, 0);   // Degrees(+counter clockwise, TurnOffset(0 is pivot)
 
-	zero();
-	targetSpeedL = motorTurnStart;
-	targetSpeedR = motorTurnStart;
+    //Arm Raise
+	liftArm(50, 1000, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+    
+    //Move forward 2ft 0in
+    moveForward(2, 0);
+        pointTurn(85, 0);   // Degrees(+counter clockwise, TurnOffset(0 is pivot)
 
-	while(abs(SensorValue[leftEncoder]) < abs(totalLticks) || abs(SensorValue[rightEncoder]) < abs(totalRticks))
-  {
-  	step++;
-  	if (step % 10 == 0)
-  	{
-  		changeDelta();
-  	}
+     //Move forward 4ft 0in
+    moveForward(4, 0);
 
-		//Left Motor
-  	if (abs(SensorValue[leftEncoder]) < abs(totalLticks))
-		{
-				smoothSpeedL = lerp(smoothSpeedL, (totalLticks > 0 ? targetSpeedL : -targetSpeedL), speedSmoothing);
-				motor[leftMotor] = smoothSpeedL;
-		}
-		else
-		{
-				smoothSpeedL = lerp(smoothSpeedL, motorStop, 1);
-				motor[leftMotor] = smoothSpeedL;
-		}
+    wait1Msec(3000);
 
-		//Right Motor
-		if (abs(SensorValue[rightEncoder]) < abs(totalRticks))
-		{
-				smoothSpeedR = lerp(smoothSpeedR, (totalRticks > 0 ? targetSpeedR : -targetSpeedR), speedSmoothing);
-				motor[rightMotor] = smoothSpeedR;
-		}
-		else
-		{
-				smoothSpeedR = lerp(smoothSpeedR, motorStop, 1);
-				motor[rightMotor] = smoothSpeedR;
-		}
-	}
+/* Arm and Claw Functions
+    //Arm Raise
+	//liftArm(50, 1000, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
-	smoothSpeedL = 0;
-	smoothSpeedR = 0;
-	motor[leftMotor] = 0;
-	motor[rightMotor] = 0;
-	wait1Msec(1000);
+    //Open Claw
+	//liftArm(0, 1000, 0, 50, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	
+    //Claw Grip and Arm Raise
+	//liftArm(50, 2100, 0, -50, -30);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+
+    //Relax Claw and Arm
+	//liftArm(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+*/
 }
 
-/*void openClaw(bool open, int mSec, )
+
+void tankFunct()
 {
-	motor[clawMotor] = open ? openSpeed : -openSpeed;
-	wait1Msec(mSec);
-	motor[clawMotor] = gripStrength;
-}*/
+//Left Motor
+    if (abs(vexRT[Ch3]) >= tol){
+        motor[leftMotor] = vexRT[Ch3] * tankMaxSpeed / 127;
+    } else {
+    motor[leftMotor] = 0;
+    }
 
-		void liftArm(float armMove, int mSec, float armHold, float openSpeed, float gripStrength)
-		{
-			motor[clawMotor] = openSpeed;
-			wait1Msec(mSec);
+//Right Motor
+    if (abs(vexRT[Ch2]) >= tol){
+        motor[rightMotor] = vexRT[Ch2] * tankMaxSpeed / 127;
+    } else {
+    motor[rightMotor] = 0;
+    }
 
-			motor[clawMotor] = gripStrength;
-			motor[armMotor] = armMove;
-			wait1Msec(mSec);
+//Arm
+        if (vexRT[Btn5U] && vexRT[Btn5D])	//UP and Down
+        {
+            motor[clawMotor] = 20;
+        }
+        else if (vexRT[Btn5U])
+        {
+            motor[clawMotor] = 65;
+        }
+        else if (vexRT[Btn5D])
+        {
+            motor[clawMotor] = -25;
+        }
+        else
+        {
+            motor[clawMotor] = 0;
+        }
 
-			motor[clawMotor] = gripStrength;
-			motor[armMotor] = armHold;
+//Claw6
 
-		}
+    if (vexRT[Btn8U])	//UP and Down
+    {
+        clawGrip = true;
+    }
+    else if (vexRT[Btn6U])
+    {
+        clawGrip = false;
+    }
 
-void labyrinth()
+
+    if (clawGrip)
+    {
+        motor[armMotor] = 25;
+    }
+    else if (vexRT[Btn6U])
+    {
+        motor[armMotor] = -40;
+    }
+    else if (vexRT[Btn6D])
+    {
+        motor[armMotor] = 40;
+    }
+    else
+    {
+        motor[armMotor] = 0;
+    }
+}	//End tankFunct()
+
+void joystickFunct()
 {
-	liftArm(0, 1000, 0, 50, 0);	// +Raise/-Lower speed, delay, hold speed
-	moveForward(26.5 + 17);
-
-	liftArm(50, 2100, 0, -50, -30);	// +Raise/-Lower speed, delay, hold speed
-	moveBackward(17);
-		pointTurn(85, 0);		// Positive is counter clockwise
-
-
-
-
-	moveForward(30);
-		pointTurn(-88, 0);	//Positive is counter clockwise
-
-	moveForward(21);
-		pointTurn(-90, 0);	//Positive is counter clockwise
-
-	moveForward(13);
-
-
-	wait1Msec(3000);
-	liftArm(0,0, 0, 0, 0);	// +Raise/-Lower speed, delay, hold speed
-	//openClaw(true, 0, 0, 0);
+    motor[leftMotor] = 0;
+    motor[rightMotor] = 0;
 }
-
-
-
-
-		void tankFunct()
-		{
-		//Left Motor
-			if (abs(vexRT[Ch3]) >= tol){
-				motor[leftMotor] = vexRT[Ch3] * tankMaxSpeed / 127;
-			} else {
-			motor[leftMotor] = 0;
-			}
-
-		//Right Motor
-			if (abs(vexRT[Ch2]) >= tol){
-				motor[rightMotor] = vexRT[Ch2] * tankMaxSpeed / 127;
-			} else {
-			motor[rightMotor] = 0;
-			}
-
-		//Arm
-				if (vexRT[Btn5U] && vexRT[Btn5D])	//UP and Down
-				{
-					motor[clawMotor] = 20;
-				}
-				else if (vexRT[Btn5U])
-				{
-					motor[clawMotor] = 65;
-				}
-				else if (vexRT[Btn5D])
-				{
-					motor[clawMotor] = -25;
-				}
-				else
-				{
-					motor[clawMotor] = 0;
-				}
-
-		//Claw6
-
-			if (vexRT[Btn8U])	//UP and Down
-			{
-				clawGrip = true;
-			}
-			else if (vexRT[Btn6U])
-			{
-				clawGrip = false;
-			}
-
-
-			if (clawGrip)
-			{
-				motor[armMotor] = 25;
-			}
-			else if (vexRT[Btn6U])
-			{
-				motor[armMotor] = -40;
-			}
-			else if (vexRT[Btn6D])
-			{
-				motor[armMotor] = 40;
-			}
-			else
-			{
-				motor[armMotor] = 0;
-			}
-		}	//End tankFunct()
-
-		void joystickFunct()
-		{
-			motor[leftMotor] = 0;
-			motor[rightMotor] = 0;
-		}
 
 /*--------------------*\
 |*			Task Main			*|
@@ -389,13 +387,13 @@ task main()
 
 		if (tank)
 			tankFunct();
-		else if (joystick)
-			joystickFunct();
+		/*else if (joystick)
+			joystickFunct();*/
 
-		/*if (vexRT[Btn8U] == 1)
+		if (vexRT[Btn8U] == 1)
 		{
-			labyrinth();
+			autonomous();
 
-		}*/
+		}
 	}
 }
