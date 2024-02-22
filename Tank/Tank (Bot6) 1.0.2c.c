@@ -67,6 +67,8 @@ bool clawGripState = false;
 
         void zero()
         {
+            ClearTimer(T1);
+            ClearTimer(T2);
             SensorValue[leftEncoder] = 0;
             SensorValue[rightEncoder] = 0;
             smoothSpeedL = 0;
@@ -281,15 +283,36 @@ bool clawGripState = false;
 |*    Timed Autonomous    *|
 \*------------------------*/
 
-    void moveForwardTime( int speed, int mSec)
+    void moveForwardTime(int speed, int mSec)
     {
       zero();
-      { //Speed Up
+      //Speed Up
+      while(time1(T1) < mSec)
+      {
         targetSpeedL = speed;
         targetSpeedR = speed;
         accelHandling(true);
       }
-      wait1Msec(mSec);
+
+      while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
+      { //Slow Down
+        targetSpeedL = 0;
+        targetSpeedR = 0;
+        accelHandling(true);
+      }
+      zero();
+    }
+
+    void moveForwardTime(int speed, int mSec)
+    {
+      zero();
+      //Speed Up
+      while(time1(T1) < mSec)
+      {
+        targetSpeedL = speed;
+        targetSpeedR = speed;
+        accelHandling(true);
+      }
 
       while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
       { //Slow Down
@@ -303,12 +326,13 @@ bool clawGripState = false;
     void pointTurnTime(int speed, int mSec, bool dir)
     {
       zero();
-      { //Speed Up
+      //Speed Up
+      while(time1(T1) < mSec)
+      {
         targetSpeedL = dir ? speed : -speed;
         targetSpeedR = dir ? -speed : speed;
         accelHandling(true);
       }
-      wait1Msec(mSec);
 
       while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
       { //Slow down
@@ -402,7 +426,19 @@ void tankDrive()
 
 void joystickDrive()
 {
-    zero();
+     //Left Motor
+    {
+        if (abs(vexRT[Ch2]) >= tol || abs(vexRT[Ch4]) >= tol){
+            targetSpeedL = (vexRT[Ch2] + vexRT[Ch4])/2 * (tankMaxSpeed / 127);
+            targetSpeedR = (vexRT[Ch2] - vexRT[Ch4])/2 * (tankMaxSpeed / 127);
+            accelHandling();
+        }
+        else
+        {
+            motor[leftMotor] = 0;
+            motor[rightMotor] = 0;
+        }
+    }   //Left Motor
 }   //End joystickDrive
 
 void armAndClaw()
@@ -429,7 +465,7 @@ void armAndClaw()
 
     //Claw6
     {
-        if (closeCount > 2 * 1000/tps)  //seconds * time per iteration
+        if (time1[T2] > 2 * 1000/tps)  //seconds * time per iteration
         {
             clawCloseState = false;
             clawGripState = true;
@@ -438,7 +474,7 @@ void armAndClaw()
         {
             clawCloseState = true;
             clawGripState = false;
-            closeCount = 0;
+            ClearTimer[T2];
         }
         else if (vexRT[Btn6U])
         {
@@ -454,7 +490,6 @@ void armAndClaw()
         else if (clawCloseState) //Close
         {
             motor[clawMotor] = clawClose;
-            closeCount++;
         }
         else if (vexRT[Btn6U])  //Open
         {
