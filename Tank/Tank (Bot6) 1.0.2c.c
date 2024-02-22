@@ -39,20 +39,21 @@ const float armHold  = 20;
 const float clawOpen  = -40;
 const float clawClose = 40;
 const float clawGrip  = -25;
+float closeCount = 0;
 
-/*int step = 0;
+int step = 0;
 int ticksLI = 0; //just a variable to store which tick we're on (for the left side)
 int ticksLF = 0;
 int ticksRI = 0;
 int ticksRF = 0;
 int speedL = 0;
-int speedR = 0; */
+int speedR = 0;
 
 bool tank = true;
 bool joystick = false;
 
-bool clawClose = false;
-bool clawGrip = false;
+bool clawCloseState = false;
+bool clawGripState = false;
 
 
 /*------------------------*\
@@ -81,7 +82,7 @@ bool clawGrip = false;
             speedL 	= 0;	speedR 	= 0;
         }
 
-        /* void changeDelta()
+        void changeDelta()
 				{
 					// ticks final = current # of ticks in wheel
 					ticksLF = abs(SensorValue[leftEncoder]);
@@ -105,7 +106,7 @@ bool clawGrip = false;
 					// ticks initial = ticks final
 					//ticksLI = ticksLF;
 					//ticksRI = ticksRF;
-				}*/
+				}
 
         void accelHandling(bool fast)
         {
@@ -178,6 +179,7 @@ bool clawGrip = false;
         int ticks = (-distance / (wheelDiam * PI)) * (encoderTicks);
 
         zero();
+
     while(SensorValue[leftEncoder] > ticks || SensorValue[rightEncoder] > ticks)
     {
             //Left Motor
@@ -338,7 +340,7 @@ void autonomous()
   //Move forward at speed 50 for 5 seconds
   moveForwardTime(50, 5000);
     //Turn true (right) at speed 50 for 2 seconds
-    pointTurnTime(50, 2000, true);   
+    pointTurnTime(50, 2000, true);
 
   //Arm Raise & Hold
 	liftArmTime(50, 1000, armHold, 0, clawGrip);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
@@ -346,29 +348,29 @@ void autonomous()
   //Move forward at speed 50 for 1 second
   moveForwardTime(50, 1000);
     //Turn true (right) at speed 50 for 2 seconds
-    pointTurnTime(50, 2000, true); 
+    pointTurnTime(50, 2000, true);
 
   //Move forward at speed 50 for 3 seconds
   moveForwardTime(50, 3000);
 
   //Relax Claw and Arm
-	liftArm(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	liftArmTime(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
   wait1Msec(50);
   zero();
 
 /* Arm and Claw Functions
     //Arm Raise & Hold
-	//liftArm(50, 1000, armHold, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	//liftArmTime(50, 1000, armHold, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Open Claw
-	//liftArm(0, 1000, 0, 50, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	//liftArmTime(0, 1000, 0, 50, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Claw Grip and Arm Raise
-	//liftArm(50, 2100, armHold, -50, clawGrip);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	//liftArmTime(50, 2100, armHold, -50, clawGrip);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Relax Claw and Arm
-	//liftArm(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	//liftArmTime(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 */
 }
 
@@ -409,15 +411,15 @@ void armAndClaw()
     {
         if (vexRT[Btn5U] && vexRT[Btn5D])	//Hold
         {
-            motor[armMotor] = 20;
+            motor[armMotor] = armHold;
         }
         else if (vexRT[Btn5U])  //Raise
         {
-            motor[armMotor] = 100;
+            motor[armMotor] = armRaise;
         }
         else if (vexRT[Btn5D])  //Lower
         {
-            motor[armMotor] = -60;
+            motor[armMotor] = armLower;
         }
         else    //Idle
         {
@@ -429,34 +431,34 @@ void armAndClaw()
     {
         if (closeCount > 2 * 1000/tps)  //seconds * time per iteration
         {
-            clawClose = false;
-            clawGrip = true;
+            clawCloseState = false;
+            clawGripState = true;
         }
         else if (vexRT[Btn6D])	//UP and Down
         {
-            clawClose = true;
-            clawGrip = false;
+            clawCloseState = true;
+            clawGripState = false;
             closeCount = 0;
         }
         else if (vexRT[Btn6U])
         {
-            clawClose = false;
-            clawGrip = false;
+            clawCloseState = false;
+            clawGripState = false;
         }
 
 
-        if (clawGrip)   //Grip
+        if (clawGripState)   //Grip
         {
-            motor[clawMotor] = -25;
+            motor[clawMotor] = clawGrip;
         }
-        else if (clawClose) //Close
+        else if (clawCloseState) //Close
         {
-            motor[clawMotor] = -40;
+            motor[clawMotor] = clawClose;
             closeCount++;
         }
         else if (vexRT[Btn6U])  //Open
         {
-            motor[clawMotor] = 40;
+            motor[clawMotor] = clawOpen;
         }
         else    //Idle
         {
@@ -494,7 +496,7 @@ task main()
     //Drive
     if (vexRT[Btn8U] == 1)
 		{
-			//autonomous();
+			autonomous();
 		}
 		else if (tank)
     {
@@ -509,5 +511,12 @@ task main()
 
     wait1Msec(1000/tps);
 	}
-}
 
+	//Unreferenced functions
+	if(false)
+	{
+		moveForward(0, 0);
+		moveBackward(0, 0);
+		pointTurn(0, 0);
+	}
+}
