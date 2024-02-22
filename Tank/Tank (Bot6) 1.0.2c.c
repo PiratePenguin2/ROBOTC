@@ -488,8 +488,8 @@ void armAndClaw()
 
 task main()
 {
-	tank = true;
-	joystick = false;
+	tank = false;
+	joystick = true;
 
 	while (true)
 	{
