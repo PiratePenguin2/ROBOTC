@@ -107,10 +107,10 @@ bool clawGrip = false;
 					//ticksRI = ticksRF;
 				}*/
 
-        void accelHandling()
+        void accelHandling(bool fast)
         {
-          smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, speedSmoothingFast);
-          smoothSpeedR = lerp(smoothSpeedR, targetSpeedR, speedSmoothingFast);
+          smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, fast ? speedSmoothingFast : speedSmoothingSlow);
+          smoothSpeedR = lerp(smoothSpeedR, targetSpeedR, fast ? speedSmoothingFast : speedSmoothingSlow);
 
           motor(leftMotor) = smoothSpeedL;
           motor(rightMotor) = smoothSpeedR;
@@ -285,7 +285,7 @@ bool clawGrip = false;
       { //Speed Up
         targetSpeedL = speed;
         targetSpeedR = speed;
-        accelHandling();
+        accelHandling(true);
       }
       wait1Msec(mSec);
 
@@ -293,7 +293,7 @@ bool clawGrip = false;
       { //Slow Down
         targetSpeedL = 0;
         targetSpeedR = 0;
-        accelHandling();
+        accelHandling(true);
       }
       zero();
     }
@@ -304,7 +304,7 @@ bool clawGrip = false;
       { //Speed Up
         targetSpeedL = dir ? speed : -speed;
         targetSpeedR = dir ? -speed : speed;
-        accelHandling();
+        accelHandling(true);
       }
       wait1Msec(mSec);
 
@@ -312,7 +312,7 @@ bool clawGrip = false;
       { //Slow down
         targetSpeedL = 0;
         targetSpeedR = 0;
-        accelHandling();
+        accelHandling(true);
       }
       zero();
     }
