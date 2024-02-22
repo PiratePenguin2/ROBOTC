@@ -286,7 +286,7 @@ bool clawGripState = false;
     {
       zero();
       //Speed Up
-      while(time1(T1) < mSec)
+      while(time1[T1] < mSec)
       {
         targetSpeedL = speed;
         targetSpeedR = speed;
@@ -306,7 +306,7 @@ bool clawGripState = false;
     {
       zero();
       //Speed Up
-      while(time1(T1) < mSec)
+      while(time1[T1] < mSec)
       {
         targetSpeedL = dir ? speed : -speed;
         targetSpeedR = dir ? -speed : speed;
@@ -442,9 +442,9 @@ void armAndClaw()
         }
     }   //Arm
 
-    //Claw6
+    //Claw
     {
-        if (time1[T2] > 2 * 1000/tps)  //seconds * time per iteration
+        if (time1[T2] > 2000)  //seconds * time per iteration
         {
             clawCloseState = false;
             clawGripState = true;
