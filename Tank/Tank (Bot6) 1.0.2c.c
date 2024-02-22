@@ -455,7 +455,7 @@ void armAndClaw()
             clawGripState = false;
             clearTimer(T2);
         }
-        else if (vexRT[Btn6U])
+        if (vexRT[Btn6U])
         {
             clawCloseState = false;
             clawGripState = false;
