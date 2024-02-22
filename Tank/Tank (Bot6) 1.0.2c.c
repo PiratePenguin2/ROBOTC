@@ -8,6 +8,7 @@
 
 const int tol = 20;
 const float tankMaxSpeed = 127;
+int tps = 8;
 
 const int encoderTicks = 360;
 const int wheelDiam = 4;
@@ -41,6 +42,7 @@ int speedR = 0;
 bool tank = true;
 bool joystick = false;
 
+bool clawClose = false;
 bool clawGrip = false;
 
 
@@ -243,7 +245,24 @@ bool clawGrip = false;
         wait1Msec(1000);
     }
 
-    void liftArm(float armMove, int mSec, float armHold, float openSpeed, float gripStrength)
+
+
+    void moveForwardTime(int mSec, int speed)
+    {
+        motor(leftMotor) = speed;
+        motor(rightMotor) = speed;
+        wait1Msec(mSec);
+
+        motor(leftMotor) = 0;
+        motor(rightMotor) = 0;
+    }
+
+    void pointTurnTime(int mSec, int speed)
+    {
+
+    }
+
+    void liftArmTime(float armMove, int mSec, float armHold, float openSpeed, float gripStrength)
     {
         motor[clawMotor] = openSpeed;
         wait1Msec(mSec);
@@ -265,7 +284,7 @@ void autonomous()
         pointTurn(85, 0);   // Degrees(+counter clockwise, TurnOffset(0 is pivot)
 
     //Arm Raise
-	liftArm(50, 1000, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	liftArmTime(50, 1000, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Move forward 2ft 0in
     moveForward(2, 0);
@@ -294,66 +313,82 @@ void autonomous()
 
 void tankFunct()
 {
-//Left Motor
-    if (abs(vexRT[Ch3]) >= tol){
-        motor[leftMotor] = vexRT[Ch3] * tankMaxSpeed / 127;
-    } else {
-    motor[leftMotor] = 0;
-    }
+    //Left Motor
+    {
+        if (abs(vexRT[Ch3]) >= tol){
+            motor[leftMotor] = vexRT[Ch3] * tankMaxSpeed / 127;
+        } else {
+            motor[leftMotor] = 0;
+        }
+    }   //Left Motor
 
-//Right Motor
-    if (abs(vexRT[Ch2]) >= tol){
-        motor[rightMotor] = vexRT[Ch2] * tankMaxSpeed / 127;
-    } else {
-    motor[rightMotor] = 0;
-    }
+    //Right Motor
+    {
+        if (abs(vexRT[Ch2]) >= tol){
+            motor[rightMotor] = vexRT[Ch2] * tankMaxSpeed / 127;
+        } else {
+            motor[rightMotor] = 0;
+        }
+    }   //Right Motor
 
-//Arm
+    //Arm
+    {
         if (vexRT[Btn5U] && vexRT[Btn5D])	//UP and Down
         {
             motor[clawMotor] = 20;
         }
         else if (vexRT[Btn5U])
         {
-            motor[clawMotor] = 110;
+            motor[clawMotor] = 65;
         }
         else if (vexRT[Btn5D])
         {
-            motor[clawMotor] = -60;
+            motor[clawMotor] = -25;
         }
         else
         {
             motor[clawMotor] = 0;
         }
+    }   //Arm
 
-//Claw6
+    //Claw6
+    {
+        if (closeCount > 2 * 1000/tps)  //seconds * time per iteration
+        {
+            clawClose = false;
+            clawGrip = true;
+        }
+        else if (vexRT[Btn6D])	//UP and Down
+        {
+            clawClose = true;
+            clawGrip = false;
+            closeCount = 0;
+        }
+        else if (vexRT[Btn6U])
+        {
+            clawClose = false;
+            clawGrip = false;
+        }
 
-    /*if (vexRT[Btn8U])	//UP and Down
-    {
-        clawGrip = true;
-    }
-    else if (vexRT[Btn6U])
-    {
-        clawGrip = false;
-    }*/
 
-
-    if (vexRT[Btn6U] && vexRT[Btn6D])
-    {
-        motor[armMotor] = -25;
-    }
-    else if (vexRT[Btn6U])
-    {
-        motor[armMotor] = 40;
-    }
-    else if (vexRT[Btn6D])
-    {
-        motor[armMotor] = -40;
-    }
-    else
-    {
-        motor[armMotor] = 0;
-    }
+        if (clawGrip)
+        {
+            motor[armMotor] = -25;
+        }
+        else if (clawClose)
+        {
+            motor[armMotor] = 40;
+            closeCount++;
+        }
+        else if (vexRT[Btn6D])
+        {
+            motor[armMotor] = -40;
+        }
+        else
+        {
+            motor[armMotor] = 0;
+        }
+    }   //Claw
 }	//End tankFunct()
 
 void joystickFunct()
@@ -369,21 +404,12 @@ void joystickFunct()
 
 task main()
 {
+
 	tank = true;
 	joystick = false;
 
 	while (true)
 	{
-		/*if (vexRT[Btn7D])
-		{
-			tank = true;
-			joystick = false;
-		}
-		else if (vexRT[Btn8D])
-		{
-			joystick = true;
-			tank = false;
-		}*/
 
 		if (tank)
 			tankFunct();
@@ -395,5 +421,17 @@ task main()
 			//autonomous();
 
 		}
+        wait1Msec(1000/tps);
 	}
 }
+
+		/*if (vexRT[Btn7D])
+		{
+			tank = true;
+			joystick = false;
+		}
+		else if (vexRT[Btn8D])
+		{
+			joystick = true;
+			tank = false;
+		}*/
