@@ -24,20 +24,29 @@ const float motorTurnLow = 45;
 
 const float motorStop = 0;
 
-const float speedSmooarmMotor = 0.001;	//0.001
+const float speedSmoothingFast = 0.001;
+const float speedSmoothingSlow = 0.2;
 
 float targetSpeedL = 0.0;
 float targetSpeedR = 0.0;
 float smoothSpeedL = 0.0;
 float smoothSpeedR = 0.0;
 
-int step = 0;
+const float armRaise = 100;
+const float armLower = -60;
+const float armHold  = 20;
+
+const float clawOpen  = -40;
+const float clawClose = 40;
+const float clawGrip  = -25;
+
+/*int step = 0;
 int ticksLI = 0; //just a variable to store which tick we're on (for the left side)
 int ticksLF = 0;
 int ticksRI = 0;
 int ticksRF = 0;
 int speedL = 0;
-int speedR = 0;
+int speedR = 0; */
 
 bool tank = true;
 bool joystick = false;
@@ -50,10 +59,10 @@ bool clawGrip = false;
 |*    Helpful Equations   *|
 \*------------------------*/
 
-        float lerp(float a, float b, float weight)
-        {
-            return a * (1 - weight) + b*weight;
-        }
+            float lerp(float a, float b, float weight)
+            {
+                return a * (1 - weight) + b*weight;
+            }
 
         void zero()
         {
@@ -72,7 +81,7 @@ bool clawGrip = false;
             speedL 	= 0;	speedR 	= 0;
         }
 
-        void changeDelta()
+        /* void changeDelta()
 				{
 					// ticks final = current # of ticks in wheel
 					ticksLF = abs(SensorValue[leftEncoder]);
@@ -96,8 +105,16 @@ bool clawGrip = false;
 					// ticks initial = ticks final
 					//ticksLI = ticksLF;
 					//ticksRI = ticksRF;
-				}
+				}*/
 
+        void accelHandling()
+        {
+          smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, speedSmoothingFast);
+          smoothSpeedR = lerp(smoothSpeedR, targetSpeedR, speedSmoothingFast);
+
+          motor(leftMotor) = smoothSpeedL;
+          motor(rightMotor) = smoothSpeedR;
+        }
 
 /*--------------------------*\
 |*    Encoder Autonomous    *|
@@ -120,13 +137,13 @@ bool clawGrip = false;
                 }
                 else
                 {
-                    smoothSpeedL = lerp(smoothSpeedL, motorLow, speedSmooarmMotor);
+                    smoothSpeedL = lerp(smoothSpeedL, motorLow, speedSmoothingFast);
                     motor[leftMotor] = smoothSpeedL;
                 }
             }
             else
             {
-                    smoothSpeedL = lerp(smoothSpeedL, motorStop, speedSmooarmMotor);
+                    smoothSpeedL = lerp(smoothSpeedL, motorStop, speedSmoothingFast);
                     motor[leftMotor] = smoothSpeedL;
             }
 
@@ -139,13 +156,13 @@ bool clawGrip = false;
                 }
                 else
                 {
-                    smoothSpeedR = lerp(smoothSpeedR, motorLow, speedSmooarmMotor);
+                    smoothSpeedR = lerp(smoothSpeedR, motorLow, speedSmoothingFast);
                     motor[rightMotor] = smoothSpeedR;
                 }
             }
             else
             {
-                    smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmooarmMotor);
+                    smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmoothingFast);
                     motor[rightMotor] = smoothSpeedR;
             }
         }
@@ -172,13 +189,13 @@ bool clawGrip = false;
                 }
                 else
                 {
-                    smoothSpeedL = lerp(smoothSpeedL, -motorLow, speedSmooarmMotor);
+                    smoothSpeedL = lerp(smoothSpeedL, -motorLow, speedSmoothingFast);
                     motor[leftMotor] = smoothSpeedL;
                 }
             }
             else
             {
-                    smoothSpeedL = lerp(smoothSpeedL, -motorStop, speedSmooarmMotor);
+                    smoothSpeedL = lerp(smoothSpeedL, -motorStop, speedSmoothingFast);
                     motor[leftMotor] = smoothSpeedL;
             }
 
@@ -191,13 +208,13 @@ bool clawGrip = false;
                 }
                 else
                 {
-                    smoothSpeedR = lerp(smoothSpeedR, -motorLow, speedSmooarmMotor);
+                    smoothSpeedR = lerp(smoothSpeedR, -motorLow, speedSmoothingFast);
                     motor[rightMotor] = smoothSpeedR;
                 }
             }
             else
             {
-                    smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmooarmMotor);
+                    smoothSpeedR = lerp(smoothSpeedR, motorStop, speedSmoothingFast);
                     motor[rightMotor] = smoothSpeedR;
             }
         }
@@ -228,7 +245,7 @@ bool clawGrip = false;
             //Left Motor
         if (abs(SensorValue[leftEncoder]) < abs(totalLticks))
             {
-                    smoothSpeedL = lerp(smoothSpeedL, (totalLticks > 0 ? targetSpeedL : -targetSpeedL), speedSmooarmMotor);
+                    smoothSpeedL = lerp(smoothSpeedL, (totalLticks > 0 ? targetSpeedL : -targetSpeedL), speedSmoothingFast);
                     motor[leftMotor] = smoothSpeedL;
             }
             else
@@ -240,7 +257,7 @@ bool clawGrip = false;
             //Right Motor
             if (abs(SensorValue[rightEncoder]) < abs(totalRticks))
             {
-                    smoothSpeedR = lerp(smoothSpeedR, (totalRticks > 0 ? targetSpeedR : -targetSpeedR), speedSmooarmMotor);
+                    smoothSpeedR = lerp(smoothSpeedR, (totalRticks > 0 ? targetSpeedR : -targetSpeedR), speedSmoothingFast);
                     motor[rightMotor] = smoothSpeedR;
             }
             else
@@ -262,19 +279,42 @@ bool clawGrip = false;
 |*    Timed Autonomous    *|
 \*------------------------*/
 
-    void moveForwardTime(int mSec, int speed)
+    void moveForwardTime( int speed, int mSec)
     {
-        motor(leftMotor) = speed;
-        motor(rightMotor) = speed;
-        wait1Msec(mSec);
+      zero();
+      { //Speed Up
+        targetSpeedL = speed;
+        targetSpeedR = speed;
+        accelHandling();
+      }
+      wait1Msec(mSec);
 
-        motor(leftMotor) = 0;
-        motor(rightMotor) = 0;
+      while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
+      { //Slow Down
+        targetSpeedL = 0;
+        targetSpeedR = 0;
+        accelHandling();
+      }
+      zero();
     }
 
-    void pointTurnTime(int mSec, int speed)
+    void pointTurnTime(int speed, int mSec, bool dir)
     {
+      zero();
+      { //Speed Up
+        targetSpeedL = dir ? speed : -speed;
+        targetSpeedR = dir ? -speed : speed;
+        accelHandling();
+      }
+      wait1Msec(mSec);
 
+      while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
+      { //Slow down
+        targetSpeedL = 0;
+        targetSpeedR = 0;
+        accelHandling();
+      }
+      zero();
     }
 
     void liftArmTime(float armMove, int mSec, float armHold, float openSpeed, float gripStrength)
@@ -294,33 +334,38 @@ bool clawGrip = false;
 
 void autonomous()
 {
-    zero();
-    //Move forward 9ft 0in
-    moveForward(9, 0);
-        pointTurn(85, 0);   // Degrees(+counter clockwise, TurnOffset(0 is pivot)
+  zero();
+  //Move forward at speed 50 for 5 seconds
+  moveForwardTime(50, 5000);
+    //Turn true (right) at speed 50 for 2 seconds
+    pointTurnTime(50, 2000, true);   
 
-    //Arm Raise
-	liftArmTime(50, 1000, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+  //Arm Raise & Hold
+	liftArmTime(50, 1000, armHold, 0, clawGrip);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
-    //Move forward 2ft 0in
-    moveForward(2, 0);
-        pointTurn(85, 0);   // Degrees(+counter clockwise, TurnOffset(0 is pivot)
+  //Move forward at speed 50 for 1 second
+  moveForwardTime(50, 1000);
+    //Turn true (right) at speed 50 for 2 seconds
+    pointTurnTime(50, 2000, true); 
 
-     //Move forward 4ft 0in
-    moveForward(4, 0);
+  //Move forward at speed 50 for 3 seconds
+  moveForwardTime(50, 3000);
 
-    wait1Msec(3000);
-    zero();
+  //Relax Claw and Arm
+	liftArm(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+
+  wait1Msec(50);
+  zero();
 
 /* Arm and Claw Functions
-    //Arm Raise
-	//liftArm(50, 1000, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+    //Arm Raise & Hold
+	//liftArm(50, 1000, armHold, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Open Claw
 	//liftArm(0, 1000, 0, 50, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Claw Grip and Arm Raise
-	//liftArm(50, 2100, 0, -50, -30);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
+	//liftArm(50, 2100, armHold, -50, clawGrip);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
 
     //Relax Claw and Arm
 	//liftArm(0, 0, 0, 0, 0);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
@@ -366,11 +411,11 @@ void armAndClaw()
         {
             motor[armMotor] = 20;
         }
-        else if (vexRT[Btn5U])  //Up
+        else if (vexRT[Btn5U])  //Raise
         {
             motor[armMotor] = 100;
         }
-        else if (vexRT[Btn5D])  //Down
+        else if (vexRT[Btn5D])  //Lower
         {
             motor[armMotor] = -60;
         }
