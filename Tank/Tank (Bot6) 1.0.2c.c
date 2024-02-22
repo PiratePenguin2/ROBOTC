@@ -530,18 +530,18 @@ task main()
 
     //Drive
     if (vexRT[Btn8U] == 1)
-		{
-			autonomous();
-		}
-		else if (tank)
+	{
+		autonomous();
+	}
+	else if (tank)
     {
-			tankDrive();
-      armAndClaw();
+	    tankDrive();
+        armAndClaw();
     }
 		else if (joystick)
     {
-			joystickDrive();
-      armAndClaw();
+		joystickDrive();
+        armAndClaw();
     }
 
     wait1Msec(1000/tps);
