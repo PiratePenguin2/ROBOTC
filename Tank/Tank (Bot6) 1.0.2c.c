@@ -39,7 +39,6 @@ const float armHold  = 20;
 const float clawOpen  = -40;
 const float clawClose = 40;
 const float clawGrip  = -25;
-float closeCount = 0;
 
 int step = 0;
 int ticksLI = 0; //just a variable to store which tick we're on (for the left side)
@@ -67,8 +66,8 @@ bool clawGripState = false;
 
         void zero()
         {
-            ClearTimer(T1);
-            ClearTimer(T2);
+            clearTimer(T1);
+            clearTimer(T2);
             SensorValue[leftEncoder] = 0;
             SensorValue[rightEncoder] = 0;
             smoothSpeedL = 0;
@@ -303,26 +302,6 @@ bool clawGripState = false;
       zero();
     }
 
-    void moveForwardTime(int speed, int mSec)
-    {
-      zero();
-      //Speed Up
-      while(time1(T1) < mSec)
-      {
-        targetSpeedL = speed;
-        targetSpeedR = speed;
-        accelHandling(true);
-      }
-
-      while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
-      { //Slow Down
-        targetSpeedL = 0;
-        targetSpeedR = 0;
-        accelHandling(true);
-      }
-      zero();
-    }
-
     void pointTurnTime(int speed, int mSec, bool dir)
     {
       zero();
@@ -431,7 +410,7 @@ void joystickDrive()
         if (abs(vexRT[Ch2]) >= tol || abs(vexRT[Ch4]) >= tol){
             targetSpeedL = (vexRT[Ch2] + vexRT[Ch4])/2 * (tankMaxSpeed / 127);
             targetSpeedR = (vexRT[Ch2] - vexRT[Ch4])/2 * (tankMaxSpeed / 127);
-            accelHandling();
+            accelHandling(false);
         }
         else
         {
@@ -474,7 +453,7 @@ void armAndClaw()
         {
             clawCloseState = true;
             clawGripState = false;
-            ClearTimer[T2];
+            clearTimer[T2];
         }
         else if (vexRT[Btn6U])
         {
