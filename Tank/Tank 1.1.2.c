@@ -10,8 +10,6 @@ const int tol = 20;
 const float tankMaxSpeed = 127;
 int tps = 20;
 
-int test = 0;
-
 const int encoderTicks = 360;
 const int wheelDiam = 4;
 const int wheelWidth = 12;
@@ -424,57 +422,18 @@ void joystickDrive()
 	float drive = vexRT[Ch3];	//LY
 	float steer = vexRT[Ch1];	//RX
 
-  if (drive >= tol)	//Forward
-  {
-  	if (steer >= tol)				//Forward Right
-  	{
-  		test = 1;
-  		targetSpeedR = drive * .5;//( (2*abs(steer) - 127) / 127); //drive * (-1 to 1)
-  		targetSpeedL = drive;
-  	}
-  	else if (steer <= -tol)	//Forward Left
-  	{
-  		test = 2;
-  		targetSpeedL = drive * .5;//( (2*abs(steer) - 127) / 127); //drive * (-1 to 1)
-  		targetSpeedR = drive;
-  	}
-  	else										//Forward Straight
-  	{
-  		test = 3;
-  		targetSpeedL = drive;
-  		targetSpeedR = drive;
-  	}
-  }
+	if (abs(drive) < tol)
+	{
+		drive = 0;
+	}
+	if (abs(steer) < tol)
+	{
+		steer = 0;
+	}
 
-  else if (drive <= -tol)	//Backward
-  {
-  	if (steer >= tol)				//Backward Right
-  	{
-  		targetSpeedR = drive * .5;//( (2*abs(steer) - 127) / 127); //drive * (-1 to 1)
-  		targetSpeedL = drive;
-  	}
-  	else if (steer <= -tol)	//Backward Left
-  	{
-  		targetSpeedL = drive * .5;//( (2*abs(steer) - 127) / 127); //drive * (-1 to 1)
-  		targetSpeedR = drive;
-  	}
-  	else										//Backward Straight
-  	{
-  		targetSpeedL = drive;
-  		targetSpeedR = drive;
-  	}
-  }
-  /*else if (abs(drive) < tol && abs(steer) > tol)	//If at edges
-  {
-  	targetSpeedL = 0;
-  	targetSpeedR = 0;
-	}*/
-	else
-  {
-  	test = 4;
-  	targetSpeedL = 0;
-  	targetSpeedR = 0;
-  }
+  targetSpeedL = (drive + steer);  // (y + x)/2
+	targetSpeedR = (drive - steer);  // (y - x)/2
+
   accelHandling(false);
 }   //End joystickDrive
 
