@@ -59,12 +59,12 @@ bool clawGripState = false;
 |*    Helpful Equations   *|
 \*------------------------*/
 
-	  //============================| BEEEEEEEP |=======================
             void Beep()
-			{
-                clearTimer(T3);
-                
-                while (time1[T3] < mSec)
+			{   if (time1[T3] < 1000 + 500)
+                {
+                    clearTimer(T3);
+                }
+                while (time1[T3] < 1000)
                 {
 				    playTone(220, 500);
                 }
@@ -464,24 +464,25 @@ void armAndClaw()
 
     //Claw
     {
-        if (time1[T2] > 2000)  //seconds * time per iteration
+        //Choose Claw Mode
+        if (clawCloseState = true && time1[T2] > 2000)  //Set to Grip
         {
             clawCloseState = false;
             clawGripState = true;
         }
-        else if (vexRT[Btn6D])	//UP and Down
+        else if (vexRT[Btn6D])	//Set to Close
         {
             clawCloseState = true;
             clawGripState = false;
             clearTimer(T2);
         }
-        if (vexRT[Btn6U])
+        if (vexRT[Btn6U])   //Set to Open
         {
             clawCloseState = false;
             clawGripState = false;
         }
 
-
+        //Execute
         if (clawGripState)   //Grip
         {
             motor[clawMotor] = clawGrip;
@@ -513,47 +514,47 @@ task main()
 
 	while (true)
 	{
-    //Choose Mode
-    if (vexRT[Btn7D])
-		{
-			tank = true;
-			joystick = false;
-      zero();
-		}
-		else if (vexRT[Btn8D])
-		{
-			joystick = true;
-			tank = false;
-      zero();
-		}
+        //Choose Mode
+        if (vexRT[Btn7D])
+        {
+            tank = true;
+            joystick = false;
+            zero();
+        }
+        else if (vexRT[Btn8D])
+        {
+            joystick = true;
+            tank = false;
+            zero();
+        }
 
-    //Stupid
-    if (vexRT[Btn8R] == 1)
-    {
-        beep();
-    }
+        //Stupid
+        if (vexRT[Btn8R] == 1)
+        {
+            beep();
+        }
 
-    //Drive
-    if (vexRT[Btn8U] == 1)
-	{
-		autonomous();
-	}
-	else if (tank)
-    {
-	    tankDrive();
-        armAndClaw();
-    }
-	else if (joystick)
-    {
-		joystickDrive();
-        armAndClaw();
-    }
+        //Execute
+        if (vexRT[Btn8U] == 1)
+        {
+            autonomous();
+        }
+        else if (tank)
+        {
+            tankDrive();
+            armAndClaw();
+        }
+        else if (joystick)
+        {
+            joystickDrive();
+            armAndClaw();
+        }
 
-    wait1Msec(1000/tps);
+        wait1Msec(1000/tps);
 	}
 
 	//Unreferenced functions
-	if(false)
+	if (false)
 	{
 		moveForward(0, 0);
 		moveBackward(0, 0);
