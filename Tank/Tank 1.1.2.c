@@ -125,6 +125,9 @@ bool clawGripState = false;
           smoothSpeedL = lerp(smoothSpeedL, targetSpeedL, fast ? speedSmoothingFast : speedSmoothingSlow);
           smoothSpeedR = lerp(smoothSpeedR, targetSpeedR, fast ? speedSmoothingFast : speedSmoothingSlow);
 
+          if (abs(smoothSpeedL) < 1)	{smoothSpeedL = 0;}
+          if (abs(smoothSpeedR) < 1)	{smoothSpeedR = 0;}
+
           motor(leftMotor) = smoothSpeedL;
           motor(rightMotor) = smoothSpeedR;
         }
