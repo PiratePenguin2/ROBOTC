@@ -59,7 +59,7 @@ bool clawGripState = false;
 |*    Helpful Equations   *|
 \*------------------------*/
 
-            void Beep()
+            void beep()
 			{   if (time1[T3] < 1000 + 500)
                 {
                     clearTimer(T3);
@@ -416,28 +416,57 @@ void tankDrive()
 
 void joystickDrive()
 {
-     //Left Motor
-    {
-        if abs(vexRT[Ch2]) >= tol)
-        {
-            if (vexRT[Ch4] => 0)
-            {
-                targetSpeedL = (vexRT[Ch2] * ((-2 * vexRT[Ch4]) + 127)/127);
-                targetSPeedR = vexRT[Ch2];
-            }
-            else if (vexRT[Ch4] < 0)
-            {
-                targetSpeedR = (vexRT[Ch2] * ((2 * vexRT[Ch4]) + 127)/127);
-                targetSpeedL = vexRT[Ch2];
-            }
-        }
-        else
-        {
-            targetSpeedL = 0;
-            targetSpeedR = 0;
-        }
-        accelHandling(false);
-    }   //Left Motor
+	float drive = vexRT[Ch3];	//LY
+	float steer = vexRT[Ch1];	//RX
+
+  if (drive >= tol)	//Forward
+  {
+  	if (steer >= tol)				//Forward Right
+  	{
+  		targetSpeedR = drive * (2 * abs(steer) - 127 / 127); //drive * (-1 to 1)
+  		targetSpeedL = drive;
+  	}
+  	else if (steer <= tol)	//Forward Left
+  	{
+  		targetSpeedL = drive * (2 * abs(steer) - 127 / 127); //drive * (-1 to 1)
+  		targetSpeedR = drive;
+  	}
+  	else										//Forward Straight
+  	{
+  		targetSpeedL = drive;
+  		targetSpeedR = drive;
+  	}
+  }
+
+  if (drive >= tol)	//Backward
+  {
+  	if (steer >= tol)				//Backward Right
+  	{
+  		targetSpeedR = drive * (2 * abs(steer) - 127 / 127); //drive * (-1 to 1)
+  		targetSpeedL = drive;
+  	}
+  	else if (steer <= tol)	//Backward Left
+  	{
+  		targetSpeedL = drive * (2 * abs(steer) - 127 / 127); //drive * (-1 to 1)
+  		targetSpeedR = drive;
+  	}
+  	else										//Backward Straight
+  	{
+  		targetSpeedL = drive;
+  		targetSpeedR = drive;
+  	}
+  }
+  else if (abs(drive) < tol && abs(steer) > tol)	//If at edges
+  {
+  	targetSpeedL = 0;
+  	targetSpeedR = 0;
+	}
+	else
+  {
+  	targetSpeedL = 0;
+  	targetSpeedR = 0;
+  }
+  accelHandling(false);
 }   //End joystickDrive
 
 void armAndClaw()
@@ -465,7 +494,7 @@ void armAndClaw()
     //Claw
     {
         //Choose Claw Mode
-        if (clawCloseState = true && time1[T2] > 2000)  //Set to Grip
+        if (clawCloseState && time1[T2] > 2000)  //Set to Grip
         {
             clawCloseState = false;
             clawGripState = true;
