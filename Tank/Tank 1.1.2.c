@@ -59,6 +59,17 @@ bool clawGripState = false;
 |*    Helpful Equations   *|
 \*------------------------*/
 
+	  //============================| BEEEEEEEP |=======================
+            void Beep()
+			{
+                clearTimer(T3);
+                
+                while (time1[T3] < mSec)
+                {
+				    playTone(220, 500);
+                }
+			}
+
             float lerp(float a, float b, float weight)
             {
                 return a * (1 - weight) + b*weight;
@@ -407,16 +418,25 @@ void joystickDrive()
 {
      //Left Motor
     {
-        if (abs(vexRT[Ch2]) >= tol || abs(vexRT[Ch4]) >= tol){
-            targetSpeedL = (vexRT[Ch2] + vexRT[Ch4])/2 * (tankMaxSpeed / 127);
-            targetSpeedR = (vexRT[Ch2] - vexRT[Ch4])/2 * (tankMaxSpeed / 127);
-            accelHandling(false);
+        if abs(vexRT[Ch2]) >= tol)
+        {
+            if (vexRT[Ch4] => 0)
+            {
+                targetSpeedL = (vexRT[Ch2] * ((-2 * vexRT[Ch4]) + 127)/127);
+                targetSPeedR = vexRT[Ch2];
+            }
+            else if (vexRT[Ch4] < 0)
+            {
+                targetSpeedR = (vexRT[Ch2] * ((2 * vexRT[Ch4]) + 127)/127);
+                targetSpeedL = vexRT[Ch2];
+            }
         }
         else
         {
-            motor[leftMotor] = 0;
-            motor[rightMotor] = 0;
+            targetSpeedL = 0;
+            targetSpeedR = 0;
         }
+        accelHandling(false);
     }   //Left Motor
 }   //End joystickDrive
 
@@ -507,6 +527,12 @@ task main()
       zero();
 		}
 
+    //Stupid
+    if (vexRT[Btn8R] == 1)
+    {
+        beep();
+    }
+
     //Drive
     if (vexRT[Btn8U] == 1)
 	{
@@ -517,7 +543,7 @@ task main()
 	    tankDrive();
         armAndClaw();
     }
-		else if (joystick)
+	else if (joystick)
     {
 		joystickDrive();
         armAndClaw();
@@ -534,3 +560,17 @@ task main()
 		pointTurn(0, 0);
 	}
 }
+
+
+/*
+        if (abs(vexRT[Ch2]) >= tol || abs(vexRT[Ch4]) >= tol){
+            targetSpeedL = (vexRT[Ch2] + vexRT[Ch4])/2 * (tankMaxSpeed / 127);
+            targetSpeedR = (vexRT[Ch2] - vexRT[Ch4])/2 * (tankMaxSpeed / 127);
+            accelHandling(false);
+        }
+        else
+        {
+            motor[leftMotor] = 0;
+            motor[rightMotor] = 0;
+        }
+*/
