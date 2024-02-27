@@ -59,8 +59,9 @@ bool clawGripState = false;
 |*    Helpful Equations   *|
 \*------------------------*/
 
-            void beep()
-			{   if (time1[T3] < 1000 + 500)
+            /*void beep()
+			{   
+                if (time1[T3] < 1000 + 500)
                 {
                     clearTimer(T3);
                 }
@@ -68,7 +69,7 @@ bool clawGripState = false;
                 {
 				    playTone(220, 500);
                 }
-			}
+			}*/
 
             float lerp(float a, float b, float weight)
             {
@@ -351,7 +352,7 @@ bool clawGripState = false;
     }
 
 
-void autonomous()
+void autonomousTime()
 {
   zero();
   //Move forward at speed 50 for 5 seconds
@@ -391,6 +392,15 @@ void autonomous()
 */
 }
 
+void autonomousRed()
+{
+
+}
+
+void autonomousBlue()
+{
+
+}
 
 /*------------------*\
 |*    Normal Mode   *|
@@ -528,14 +538,20 @@ task main()
         //Stupid
         if (vexRT[Btn8R] == 1)
         {
-            beep();
+            playTone(220, 500);
+            //beep();
         }
 
         //Execute
-        if (vexRT[Btn8U] == 1)
+        if (vexRT[Btn7U] == 1)
         {
-            autonomous();
+            autonomousRed();
         }
+        else if (vexRT[Btn8U] == 1)
+        {
+            autonomousBlue();
+        }
+
         else if (tank)
         {
             tankDrive();
@@ -556,6 +572,7 @@ task main()
 		moveForward(0, 0);
 		moveBackward(0, 0);
 		pointTurn(0, 0);
+        autonomousTime();
 	}
 }
 
