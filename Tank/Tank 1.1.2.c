@@ -38,7 +38,7 @@ const float armHold  = 20;
 
 const float clawOpen  = -40;
 const float clawClose = 40;
-const float clawGrip  = -25;
+const float clawGrip  = 25;
 
 int step = 0;
 int ticksLI = 0; //just a variable to store which tick we're on (for the left side)
@@ -394,12 +394,14 @@ void autonomousTime()
 
 void autonomousRed()
 {
-
+    moveForward(8, 0); //Feet, Inches
+        pointTurn(90, 0);
 }
 
 void autonomousBlue()
 {
-
+    moveForward(8, 0); //Feet, Inches
+        pointTurn(-90, 0);
 }
 
 /*------------------*\
