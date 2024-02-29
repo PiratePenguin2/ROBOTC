@@ -51,8 +51,8 @@ int speedR = 0;
 bool tank = true;
 bool joystick = false;
 
-bool clawCloseState = false;
-bool clawGripState = false;
+//bool clawCloseState = false;
+//bool clawGripState = false;
 
 
 /*------------------------*\
