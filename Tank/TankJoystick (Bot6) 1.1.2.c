@@ -304,8 +304,9 @@ bool joystick = false;
       while(time1[T1] < mSec)
       {
         targetSpeedL = speed;
-        targetSpeedR = speed;
-        accelHandling(true);
+        targetSpeedR = speed * 0.93;
+        accelHandling(false);
+        wait1Msec(1000/tps);
       }
 
       while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
@@ -314,6 +315,7 @@ bool joystick = false;
         targetSpeedR = 0;
         accelHandling(true);
       }
+      wait1Msec(500);
       zero();
     }
 
@@ -324,8 +326,9 @@ bool joystick = false;
       while(time1[T1] < mSec)
       {
         targetSpeedL = dir ? speed : -speed;
-        targetSpeedR = dir ? -speed : speed;
-        accelHandling(true);
+        targetSpeedR = 0.93 * dir ? -speed : speed;
+        accelHandling(false);
+        wait1Msec(1000/tps);
       }
 
       while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
@@ -334,6 +337,7 @@ bool joystick = false;
         targetSpeedR = 0;
         accelHandling(true);
       }
+      wait1Msec(500);
       zero();
     }
 
@@ -394,14 +398,20 @@ void autonomousTime()
 
 void autonomousRed()
 {
-    moveForward(8, 0); //Feet, Inches
-        pointTurn(90, 0);
+    moveForwardTime(50, 7250); //Feet, Inches
+        pointTurnTime(50, 250, false);
+    moveForwardTime(50, 1200); //Feet, Inches
+        pointTurnTime(50, 250, false);
+    moveForwardTime(50, 2000); //Feet, Inches
 }
 
 void autonomousBlue()
 {
-    moveForward(8, 0); //Feet, Inches
-        pointTurn(-90, 0);
+    moveForwardTime(50, 7250); //Feet, Inches
+        pointTurnTime(50, 250, true);
+    moveForwardTime(50, 1000); //Feet, Inches
+        pointTurnTime(50, 250, true);
+    moveForwardTime(50, 2000); //Feet, Inches
 }
 
 /*------------------*\

@@ -143,7 +143,7 @@ bool clawGripState = false;
         int ticks = (distance / (wheelDiam * PI)) * (encoderTicks);
 
         zero();
-		    while(SensorValue[leftEncoder] < ticks || SensorValue[rightEncoder] < ticks)
+		    while(SensorValue[leftEncoder] < ticks && SensorValue[rightEncoder] < ticks)
 		    {
           //Left Motor
         	if (SensorValue[leftEncoder] < ticks)
@@ -196,7 +196,7 @@ bool clawGripState = false;
 
         zero();
 
-    while(SensorValue[leftEncoder] > ticks || SensorValue[rightEncoder] > ticks)
+    while(SensorValue[leftEncoder] > ticks && SensorValue[rightEncoder] > ticks)
     {
             //Left Motor
         if (SensorValue[leftEncoder] > ticks)
@@ -252,7 +252,7 @@ bool clawGripState = false;
         targetSpeedL = motorTurnStart;
         targetSpeedR = motorTurnStart;
 
-        while(abs(SensorValue[leftEncoder]) < abs(totalLticks) || abs(SensorValue[rightEncoder]) < abs(totalRticks))
+        while(abs(SensorValue[leftEncoder]) < abs(totalLticks) && abs(SensorValue[rightEncoder]) < abs(totalRticks))
     {
         step++;
         if (step % 10 == 0)
@@ -358,7 +358,7 @@ void autonomousTime()
   //Move forward at speed 50 for 5 seconds
   moveForwardTime(50, 5000);
     //Turn true (right) at speed 50 for 2 seconds
-    pointTurnTime(50, 2000, true);
+    pointTurnTime(25, 2000, true);
 
   //Arm Raise & Hold
 	liftArmTime(50, 1000, armHold, 0, clawGrip);	// +-ArmSpeed, delay, ArmHoldSpeed, +-ClawSpeed, ClawHoldSpeed
@@ -366,7 +366,7 @@ void autonomousTime()
   //Move forward at speed 50 for 1 second
   moveForwardTime(50, 1000);
     //Turn true (right) at speed 50 for 2 seconds
-    pointTurnTime(50, 2000, true);
+    pointTurnTime(25, 2000, true);
 
   //Move forward at speed 50 for 3 seconds
   moveForwardTime(50, 3000);
@@ -555,7 +555,7 @@ task main()
         }
         else if (vexRT[Btn8U] == 1)
         {
-            autonomousBlue();
+            autonomousTime();
         }
 
         else if (tank)
@@ -578,7 +578,7 @@ task main()
 		moveForward(0, 0);
 		moveBackward(0, 0);
 		pointTurn(0, 0);
-        autonomousTime();
+        autonomousBlue();
 	}
 }
 
