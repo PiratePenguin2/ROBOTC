@@ -25,7 +25,7 @@ const float motorTurnLow = 45;
 const float motorStop = 0;
 
 const float speedSmoothingFast = 0.001;
-const float speedSmoothingSlow = 0.2;
+const float speedSmoothingSlow = 0.25;
 
 float targetSpeedL = 0.0;
 float targetSpeedR = 0.0;
@@ -394,14 +394,20 @@ void autonomousTime()
 
 void autonomousRed()
 {
-    moveForward(8, 0); //Feet, Inches
-        pointTurn(90, 0);
+    moveForwardTime(50, 3000); //Feet, Inches
+        pointTurnTime(50, 100, false);
+    moveForwardTime(50, 600); //Feet, Inches
+        pointTurnTime(50, 100, false);
+    moveForwardTime(50, 1000); //Feet, Inches
 }
 
 void autonomousBlue()
 {
-    moveForward(8, 0); //Feet, Inches
-        pointTurn(-90, 0);
+    moveForwardTime(50, 7250); //Feet, Inches
+        pointTurnTime(50, 250, true);
+    moveForwardTime(50, 1200); //Feet, Inches
+        pointTurnTime(50, 250, true);
+    moveForwardTime(50, 2000); //Feet, Inches
 }
 
 /*------------------*\
@@ -555,7 +561,7 @@ task main()
         }
         else if (vexRT[Btn8U] == 1)
         {
-            autonomousTime();
+            autonomousBlue();
         }
 
         else if (tank)
@@ -578,7 +584,7 @@ task main()
 		moveForward(0, 0);
 		moveBackward(0, 0);
 		pointTurn(0, 0);
-        autonomousBlue();
+    autonomousTime();
 	}
 }
 
