@@ -304,8 +304,9 @@ bool clawGripState = false;
       while(time1[T1] < mSec)
       {
         targetSpeedL = speed;
-        targetSpeedR = speed;
-        accelHandling(true);
+        targetSpeedR = speed * 0.95;
+        accelHandling(false);
+        wait1Msec(1000/tps);
       }
 
       while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
@@ -314,6 +315,7 @@ bool clawGripState = false;
         targetSpeedR = 0;
         accelHandling(true);
       }
+      wait1Msec(500);
       zero();
     }
 
@@ -324,8 +326,9 @@ bool clawGripState = false;
       while(time1[T1] < mSec)
       {
         targetSpeedL = dir ? speed : -speed;
-        targetSpeedR = dir ? -speed : speed;
-        accelHandling(true);
+        targetSpeedR = 0.95 * dir ? -speed : speed;
+        accelHandling(false);
+        wait1Msec(1000/tps);
       }
 
       while(abs(targetSpeedL) > 2 || abs(targetSpeedR) > 2)
@@ -334,6 +337,7 @@ bool clawGripState = false;
         targetSpeedR = 0;
         accelHandling(true);
       }
+      wait1Msec(500);
       zero();
     }
 
@@ -394,20 +398,20 @@ void autonomousTime()
 
 void autonomousRed()
 {
-    moveForwardTime(50, 3000); //Feet, Inches
-        pointTurnTime(50, 100, false);
-    moveForwardTime(50, 600); //Feet, Inches
-        pointTurnTime(50, 100, false);
-    moveForwardTime(50, 1000); //Feet, Inches
+    moveForwardTime(40, 7250); //Feet, Inches
+        pointTurnTime(40, 250, false);
+    moveForwardTime(40, 1200); //Feet, Inches
+        pointTurnTime(40, 250, false);
+    moveForwardTime(40, 2000); //Feet, Inches
 }
 
 void autonomousBlue()
 {
-    moveForwardTime(50, 7250); //Feet, Inches
-        pointTurnTime(50, 250, true);
-    moveForwardTime(50, 1200); //Feet, Inches
-        pointTurnTime(50, 250, true);
-    moveForwardTime(50, 2000); //Feet, Inches
+    moveForwardTime(40, 7250); //Feet, Inches
+        pointTurnTime(40, 250, true);
+    moveForwardTime(40, 1200); //Feet, Inches
+        pointTurnTime(40, 250, true);
+    moveForwardTime(40, 2000); //Feet, Inches
 }
 
 /*------------------*\
