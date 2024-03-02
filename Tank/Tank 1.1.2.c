@@ -304,7 +304,7 @@ bool clawGripState = false;
       while(time1[T1] < mSec)
       {
         targetSpeedL = speed;
-        targetSpeedR = speed * 0.95;
+        targetSpeedR = speed * 0.77;
         accelHandling(false);
         wait1Msec(1000/tps);
       }
@@ -326,7 +326,7 @@ bool clawGripState = false;
       while(time1[T1] < mSec)
       {
         targetSpeedL = dir ? speed : -speed;
-        targetSpeedR = 0.95 * dir ? -speed : speed;
+        targetSpeedR = 0.77 * dir ? -speed : speed;
         accelHandling(false);
         wait1Msec(1000/tps);
       }
@@ -398,20 +398,20 @@ void autonomousTime()
 
 void autonomousRed()
 {
-    moveForwardTime(40, 7250); //Feet, Inches
-        pointTurnTime(40, 250, false);
-    moveForwardTime(40, 1200); //Feet, Inches
-        pointTurnTime(40, 250, false);
-    moveForwardTime(40, 2000); //Feet, Inches
+    moveForwardTime(80, 4000); //Feet, Inches
+        pointTurnTime(80, 200, false);
+    moveForwardTime(80, 500); //Feet, Inches
+        pointTurnTime(80, 200, false);
+    moveForwardTime(80, 1500); //Feet, Inches
 }
 
 void autonomousBlue()
 {
-    moveForwardTime(40, 7250); //Feet, Inches
-        pointTurnTime(40, 250, true);
-    moveForwardTime(40, 1200); //Feet, Inches
-        pointTurnTime(40, 250, true);
-    moveForwardTime(40, 2000); //Feet, Inches
+    moveForwardTime(80, 4000); //Feet, Inches
+        pointTurnTime(80, 250, true);
+    moveForwardTime(80, 700); //Feet, Inches
+        pointTurnTime(80, 250, true);
+    moveForwardTime(80, 1500); //Feet, Inches
 }
 
 /*------------------*\
